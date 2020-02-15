@@ -36,7 +36,7 @@ if (list.length) {  // 如果当前目录不为空
                 }
             })
         })
-        fs.writeFileSync(path.join(cwd, '.scaning-text.txt'), texts)
+        fs.writeFileSync(path.join(cwd, 'scaning-text.txt'), texts)
     }).catch(err => {
         console.log('err--', err)
     })
