@@ -18,7 +18,8 @@ const cwd = process.cwd() // 根目录
 
 if (list.length) {  // 如果当前目录不为空
     fileDisplay(path.join(cwd, startDir)).then(list => {
-        const files = list.filter(item => item.includes(suffix))
+        const suffixs = suffix.split(',')
+        const files = list.filter(item => suffixs.some(s => item.includes(s)))
         let texts = ''
         files.forEach(path => {
             const content = fs.readFileSync(path, 'utf-8')
@@ -32,6 +33,16 @@ if (list.length) {  // 如果当前目录不为空
                     const value = node.value.replace(/\n|\r|\s|(\r\n)/g, '')
                     if (value && !texts.includes(value)) {
                         texts += value
+                    }
+                },
+                StringLiteral(path) {
+                    const { node, parent } = path
+                    const value = node.value.replace(/\n|\r|\s|(\r\n)/g, '')
+                    const isNavigationBarTitleText = (parent.key || {}).name === 'navigationBarTitleText'
+                    const jsxAttr = parent.type === 'JSXAttribute'
+                    const isClassName = (parent.name || {}).name === 'className'
+                    if ((isNavigationBarTitleText || jsxAttr) && !isClassName) {
+                        texts += (value && !texts.includes(value)) ? value : ''
                     }
                 }
             })
